@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Collection {
+  id         String      @id @default(cuid())
+  title      String
+  queryText  String
+  status     String      @default("PENDING") // PENDING, RUNNING, DONE
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  targetUrls TargetUrl[]
+  screenshots Screenshot[]
+}
+
+model TargetUrl {
+  id           String       @id @default(cuid())
+  collectionId String
+  url          String
+  source       String       // AUTO or MANUAL
+  status       String       @default("PENDING") // PENDING, RUNNING, DONE, FAILED
+  errorMessage String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  collection   Collection   @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  screenshots  Screenshot[]
+  jobs         Job[]
+
+  @@index([collectionId])
+  @@index([status])
+}
+
+model Screenshot {
+  id           String     @id @default(cuid())
+  collectionId String
+  targetUrlId  String
+  imagePath    String
+  thumbPath    String?
+  title        String?
+  url          String
+  capturedAt   DateTime   @default(now())
+
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  targetUrl    TargetUrl  @relation(fields: [targetUrlId], references: [id], onDelete: Cascade)
+
+  @@index([collectionId])
+  @@index([targetUrlId])
+}
+
+model Job {
+  id           String    @id @default(cuid())
+  targetUrlId  String
+  type         String    @default("SCREENSHOT") // SCREENSHOT
+  status       String    @default("PENDING") // PENDING, RUNNING, DONE, FAILED
+  attempts     Int       @default(0)
+  lastError    String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  targetUrl    TargetUrl @relation(fields: [targetUrlId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@index([targetUrlId])
+}
