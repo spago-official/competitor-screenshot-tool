@@ -9,6 +9,7 @@
     "lint": "next lint",
     "worker": "tsx worker/index.ts",
     "app": "concurrently \"npm run dev\" \"npm run worker\"",
+    "start:all": "concurrently \"npm run start\" \"npm run worker\"",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "postinstall": "npx playwright install chromium"
