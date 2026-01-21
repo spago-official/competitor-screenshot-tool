@@ -11,7 +11,7 @@
     "app": "concurrently \"npm run dev\" \"npm run worker\"",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "postinstall": "prisma generate && npx playwright install chromium"
+    "postinstall": "npx playwright install chromium"
   },
   "dependencies": {
     "@prisma/client": "^6.2.0",
